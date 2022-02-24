@@ -17,6 +17,7 @@ type PathHandler struct {
 type GinRouter struct {
 	handlers map[string][]PathHandler
 	option   sdk.Options
+	mw       []gin.HandlerFunc
 }
 
 // NewGinRouter create a gin router struct
@@ -34,6 +35,9 @@ func (r *GinRouter) SetLog(l log.Logger) {
 
 // Router gin group func
 func (r *GinRouter) Router(group *gin.RouterGroup) {
+
+	group.Use(r.mw...)
+
 	for method, handlers := range r.handlers {
 		for _, pathHandler := range handlers {
 			group.Handle(method, pathHandler.Path, pathHandler.Handler)
@@ -149,4 +153,8 @@ func (r *GinRouter) Job(handlerName string, handler job.Func) {
 		StartTime: 0,
 		EndTime:   0,
 	})
+}
+
+func (r *GinRouter) MiddleWare(mw ...gin.HandlerFunc) {
+	r.mw = mw
 }

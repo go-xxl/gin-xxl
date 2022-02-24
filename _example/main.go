@@ -14,10 +14,6 @@ import (
 func main() {
 	g := gin.New()
 
-	g.Use(func(context *gin.Context) {
-		context.Set("traceId", utils.Uuid())
-	})
-
 	router := gxxl.NewGinRouter(xxl.Options{
 		AdmAddresses:  []string{"http://127.0.0.1:8080/xxl-job-admin/"},
 		Timeout:       10 * time.Second,
@@ -38,6 +34,10 @@ func main() {
 			HandleCode:  admin.SuccessCode,
 			HandleMsg:   "get result",
 		}
+	})
+
+	router.MiddleWare(func(ctx *gin.Context) {
+		ctx.Set("traceId", time.Now().String())
 	})
 	router.Router(&g.RouterGroup)
 	router.Register()
