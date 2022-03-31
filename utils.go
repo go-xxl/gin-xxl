@@ -34,6 +34,11 @@ func convertGinFunc(f func(ctx *server.Context)) gin.HandlerFunc {
 			TraceId: ctx.GetString("traceId"),
 		}
 
+		// set old ctx
+		for k, v := range ctx.Keys {
+			c.Set(k, v)
+		}
+
 		f(c)
 	}
 }
